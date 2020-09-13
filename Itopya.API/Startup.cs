@@ -18,6 +18,9 @@ using Newtonsoft.Json;
 using System.Reflection;
 using System;
 using System.IO;
+using Itopya.API.Filters;
+using Itopya.Application.Models.Product;
+using Itopya.Application.Models.Category;
 
 namespace Itopya.API
 {
@@ -38,7 +41,7 @@ namespace Itopya.API
                 options.SerializerSettings.MaxDepth = 1;
                 options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 options.SerializerSettings.DefaultValueHandling = DefaultValueHandling.Ignore;
-            });;
+            }); ;
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
@@ -57,13 +60,16 @@ namespace Itopya.API
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Title = "Itopya",
-                        Version = "1.0.0",
+                    Version = "1.0.0",
                 });
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
             });
             services.AddSwaggerGenNewtonsoftSupport();
+
+            services.AddScoped<PaginationFilter<ProductDto>>();
+            services.AddScoped<PaginationFilter<CategoryDto>>();
 
         }
 

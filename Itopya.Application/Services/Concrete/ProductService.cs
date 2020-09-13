@@ -34,13 +34,10 @@ namespace Itopya.Application.Services.Concrete
             var products = await _unitOfWork.Product.GetFilteredList(parameters,
                  predicate: x => x.Where(y => categoryIds.Contains(y.CategoryId)),
                  include: z => z.Include(x => x.Category));
-         
-          IEnumerable<ProductDto> mapped = _mapper.Map<IEnumerable<ProductDto>>(products);
-            
-           PagedList<ProductDto> productlist = PagedList<ProductDto>.ToEnumerablePagedList(mapped, products.MetaData.TotalCount
-               ,products.MetaData.CurrentPage, products.MetaData.PageSize,products.MetaData.TotalPages);
 
-            return productlist;
+            var mapped = _mapper.Map<PagedList<Product>, PagedList<ProductDto>>(products);
+           
+            return mapped;
         }
 
         public async Task<ProductDto> GetProduct(int id)
@@ -70,14 +67,10 @@ namespace Itopya.Application.Services.Concrete
             var product = await _unitOfWork.Product.GetById(model.Id);
 
             if (product == null)
-            {
                 return false;
-            }
 
             if (model.Image != null)
-            {
                 product.ImagePath = await _upload.UpdateFile(model.Image, product.ImagePath);
-            }
 
             var mapped = _mapper.Map(model,product);
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Itopya.API.Filters;
 using Itopya.Application.Models.Product;
 using Itopya.Application.Services.Abstract;
 using Itopya.Domain.Entities.RequestFeatures;
@@ -114,13 +115,17 @@ namespace Itopya.API.Controllers
         /// <param name="productParameters"></param>
         /// <returns>List of products</returns>
         /// <response code="200">Returns product list</response>
-        [ProducesResponseType(typeof(IEnumerable<ProductDto>), 200)]
+        /// <response code="400">CategoryId can't be null</response>
+        [ProducesResponseType(typeof(PagedList<ProductDto>), 200)]
+        [ProducesResponseType(400)]
+        [ServiceFilter(typeof(PaginationFilter<ProductDto>))]
         [HttpGet(Name = "GetProducts")]
         public async Task<IActionResult> GetProducts([FromQuery] ProductParameters productParameters)
         {
+            if(productParameters.CategoryId == 0){
+                return BadRequest("CategoryId can't be null");
+            }
             var products = await _service.GetProducts(productParameters);
-
-            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(products.MetaData));
 
             return Ok(products);
         }

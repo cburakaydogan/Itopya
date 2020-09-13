@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using Itopya.API.Filters;
 using Itopya.Application.Models.Category;
 using Itopya.Application.Services.Abstract;
 using Itopya.Domain.Entities.RequestFeatures;
@@ -116,16 +117,13 @@ namespace Itopya.API.Controllers
         /// <returns>List of Categories</returns>
         /// <response code="200">Returns category list</response>
         [HttpGet(Name = "GetCategories")]
-        [ProducesResponseType(typeof(IEnumerable<CategoryDto>), 200)]
+        [ServiceFilter(typeof(PaginationFilter<CategoryDto>))]
+        [ProducesResponseType(typeof(PagedList<CategoryDto>), 200)]
         public async Task<IActionResult> GetCategories([FromQuery] CategoryParameters categoryParameters, [FromServices] IMapper mapper)
         {
             var categories = await _service.GetAllCategories(categoryParameters);
 
-            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(categories.MetaData));
-
-            var categoriesDto = mapper.Map<IEnumerable<CategoryDto>>(categories);
-
-            return Ok(categoriesDto);
+            return Ok(categories);
         }
 
     }

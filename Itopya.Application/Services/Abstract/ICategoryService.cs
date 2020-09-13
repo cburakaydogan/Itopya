@@ -8,7 +8,7 @@ namespace Itopya.Application.Services.Abstract
 {
     public interface ICategoryService
     {
-        Task<PagedList<Category>> GetAllCategories(CategoryParameters parameters);
+        Task<PagedList<CategoryDto>> GetAllCategories(CategoryParameters parameters);
         Task<CategoryDto> GetCategory(int id);
         Task<CategoryDto> CreateCategory(CategoryCreateDto model);
         Task<bool> DeleteCategory(int id);

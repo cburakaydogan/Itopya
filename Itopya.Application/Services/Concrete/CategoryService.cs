@@ -44,7 +44,7 @@ namespace Itopya.Application.Services.Concrete
             return await _unitOfWork.Commit();
         }
        
-        public async Task<PagedList<Category>> GetAllCategories(CategoryParameters parameters)
+        public async Task<PagedList<CategoryDto>> GetAllCategories(CategoryParameters parameters)
         {
             var categories = await _unitOfWork.Category.GetFilteredList(parameters,
                 selector : y => new Category
@@ -55,7 +55,9 @@ namespace Itopya.Application.Services.Concrete
                     SubCategories = y.SubCategories.Where(z => z.ParentCategoryId == y.Id).ToList()
                 });
 
-            return categories;
+            var mapped = _mapper.Map<PagedList<Category>, PagedList<CategoryDto>>(categories);
+
+            return mapped;
         }
 
         public async Task<CategoryDto> GetCategory(int id)

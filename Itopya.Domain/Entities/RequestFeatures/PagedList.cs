@@ -8,42 +8,28 @@ namespace Itopya.Domain.Entities.RequestFeatures
 {
     public class PagedList<T> : List<T>
     {
+        public PagedList() {
+        }
+
         public MetaData MetaData { get; set; }
-        public PagedList(IQueryable<T> items, int count, int pageNumber, int pageSize)
+
+        public PagedList(List<T> items,int count, int pageNumber, int pageSize)
         {
-            MetaData = new MetaData
+           MetaData = new MetaData
             {
                 TotalCount = count,
                 PageSize = pageSize,
                 CurrentPage = pageNumber,
                 TotalPages = (int)Math.Ceiling(count / (double)pageSize)
             };
-
             AddRange(items);
         }
-        public PagedList(IEnumerable<T> items, int count, int pageNumber, int pageSize, int totalPages)
+        public static async Task<PagedList<T>> ToPagedList(IQueryable<T> source, int pageNumber, int pageSize)
         {
-            MetaData = new MetaData
-            {
-                TotalCount = count,
-                PageSize = pageSize,
-                CurrentPage = pageNumber,
-                TotalPages = totalPages
-            };
-
-            AddRange(items);
-        }
-
-        public async static Task<PagedList<T>> ToPagedList(IQueryable<T> source, int pageNumber, int pageSize)
-        {
-            var count = await source.CountAsync();
-            var items = source.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+            var count = source.Count();
+            var items = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
             return new PagedList<T>(items, count, pageNumber, pageSize);
-        }
-        public static PagedList<T> ToEnumerablePagedList(IEnumerable<T> itemList, int count, int pageNumber, int pageSize, int totalPages)
-        {
-            return new PagedList<T>(itemList, count, pageNumber, pageSize, totalPages);
         }
     }
    
